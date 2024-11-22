@@ -10,7 +10,6 @@ public class NavMeshPlayerController : MonoBehaviour
 
     private Vector3 accelerationDirection;
 
-
     void Update()
     {
         float horizontal = Input.GetAxisRaw("Horizontal");
@@ -42,7 +41,7 @@ public class NavMeshPlayerController : MonoBehaviour
             {
                 // set acceleratrion in collision direction to 0
                 accelerationDirection = Vector3.zero;
-                
+
                 // Move the player to the valid position
                 transform.position = hit.position;
 
