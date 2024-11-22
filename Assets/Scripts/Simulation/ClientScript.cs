@@ -125,9 +125,7 @@ public class ClientScript : MonoBehaviour
 
        foreach (var w in waiters)
        {
-            if(w.askForService(this)) {
-                return true;
-            }
+            // TODO
        }
         return false;
     }
