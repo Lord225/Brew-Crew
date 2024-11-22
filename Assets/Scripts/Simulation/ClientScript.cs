@@ -332,7 +332,6 @@ public class ClientScript : MonoBehaviour
             if (isDone())
             {
                 Destroy(gameObject);
-                if (angry) GameObject.Find("Waiters").GetComponent<BaristaSettings>().lostClients += 1;
             }
         }
         if (state == AgentState.Eating)
