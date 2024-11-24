@@ -10,6 +10,8 @@ public class NavMeshPlayerController : MonoBehaviour
 
     private Vector3 accelerationDirection;
 
+    private Vector3 facingDirection;
+
     void Update()
     {
         float horizontal = Input.GetAxisRaw("Horizontal");
@@ -23,6 +25,7 @@ public class NavMeshPlayerController : MonoBehaviour
         {
             accelerationDirection = Vector3.MoveTowards(accelerationDirection, Vector3.zero, deceleration * Time.deltaTime);
         }
+
         accelerationDirection = Vector3.ClampMagnitude(accelerationDirection, moveSpeed);
 
         Vector3 targetPosition = transform.position + accelerationDirection * Time.deltaTime;
@@ -31,24 +34,34 @@ public class NavMeshPlayerController : MonoBehaviour
         {
             // Move the player to the valid position
             transform.position = targetPosition;
-
-            // Smoothly rotate the player to face the movement direction
-            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
-        } else {
+        }
+        else
+        {
             // find the closest valid position
             if (NavMesh.FindClosestEdge(transform.position, out hit, NavMesh.AllAreas))
             {
-                // set acceleratrion in collision direction to 0
+                // set acceleration in collision direction to 0
                 accelerationDirection = Vector3.zero;
 
                 // Move the player to the valid position
                 transform.position = hit.position;
 
-                // Smoothly rotate the player to face the movement direction
-                Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
+                // Smoothly rotate the player to face the movement direction if there is any movement
+                if (moveDirection.magnitude > 0.1f)
+                {
+                    Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
+                    transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
+                }
             }
+        }
+
+        facingDirection = Vector3.Lerp(facingDirection, moveDirection, 0.1f);
+
+        // Smoothly rotate the player to face the movement direction if there is any movement
+        if (facingDirection.magnitude > 0.1f)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(facingDirection);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
         }
     }
 }
