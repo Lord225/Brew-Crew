@@ -2,9 +2,13 @@ using UnityEngine;
 
 public class CoffeMachine : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public SphereCollider coffeMachineInteractionDistance;
+    
+
     void Start()
     {
+        coffeMachineInteractionDistance = GetComponent<SphereCollider>();
+
         
     }
 
@@ -12,5 +16,6 @@ public class CoffeMachine : MonoBehaviour
     void Update()
     {
         
+
     }
 }

@@ -12,6 +12,28 @@ public class NavMeshPlayerController : MonoBehaviour
 
     private Vector3 facingDirection;
 
+    private Inventory inventory;
+    private Transform hand;
+
+    void Start()
+    {
+        inventory = GetComponent<Inventory>();
+        hand = transform.Find("Hand");
+
+        inventory.OnInventoryItemChanged += (GameObject newItem) =>
+        {
+            if (newItem != null)
+            {
+                newItem.transform.SetParent(hand);
+                newItem.transform.localPosition = Vector3.zero;
+                newItem.transform.localRotation = Quaternion.identity;
+                newItem.transform.localScale = Vector3.one;
+            } else {
+                hand.DetachChildren();
+            }
+        };
+    }
+
     void Update()
     {
         float horizontal = Input.GetAxisRaw("Horizontal");
