@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: coffeMachine
   m_EditorClassIdentifier: 
   m_Cells:
-  - m_GameObject: {fileID: 919132149155446097, guid: 98a836c3cd70acb4c977b91eb678e2f4, type: 3}
+  - m_GameObject: {fileID: 6784803846625583348, guid: 4ce50f6a2f28a9541979be571ddbaf7f, type: 3}
     m_Offset: {x: 0, y: 0, z: 0.9}
     m_Scale: {x: 1, y: 1, z: 1}
     m_Orientation: {x: 0.49999997, y: 0.49999997, z: 0.49999997, w: -0.49999997}

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Wall-L
   m_EditorClassIdentifier: 
   m_Cells:
-  - m_GameObject: {fileID: 919132149155446097, guid: 9acc3efdbb8b55242b322e4151f34af1, type: 3}
+  - m_GameObject: {fileID: 8326849212985995745, guid: a8f192c229bb1e14f85535376e4b8ab7, type: 3}
     m_Offset: {x: 0, y: 0, z: 0}
     m_Scale: {x: 1, y: 1, z: 1}
     m_Orientation: {x: 0, y: 0.7071067, z: 0.7071067, w: 0}
