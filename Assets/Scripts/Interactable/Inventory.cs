@@ -13,7 +13,6 @@ public class Inventory : MonoBehaviour
             if (value != inventoryItem)
             {
                 inventoryItem = value;
-                Debug.Log("InventoryItem set via property.");
                 OnInventoryItemChanged?.Invoke(inventoryItem);
             }
         }
@@ -24,30 +23,19 @@ public class Inventory : MonoBehaviour
 
     void Start()
     {
-        Debug.Log("Start method called.");
         if (OnInventoryItemChanged != null)
         {
-            Debug.Log("OnInventoryItemChanged has subscribers.");
             OnInventoryItemChanged.Invoke(inventoryItem);
         }
-        else
-        {
-            Debug.Log("OnInventoryItemChanged has no subscribers.");
-        }
+
     }
 
     // This method is called when the script is loaded or a value is changed in the inspector
     private void OnValidate()
     {
-        Debug.Log("OnValidate method called.");
         if (OnInventoryItemChanged != null)
         {
-            Debug.Log("OnInventoryItemChanged has subscribers.");
             OnInventoryItemChanged.Invoke(inventoryItem);
-        }
-        else
-        {
-            Debug.Log("OnInventoryItemChanged has no subscribers.");
         }
     }
 

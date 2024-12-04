@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -14,6 +15,7 @@ public class NavMeshPlayerController : MonoBehaviour
 
     private Inventory inventory;
     private Transform hand;
+    
 
     void Start()
     {
@@ -28,14 +30,22 @@ public class NavMeshPlayerController : MonoBehaviour
                 newItem.transform.localPosition = Vector3.zero;
                 newItem.transform.localRotation = Quaternion.identity;
                 newItem.transform.localScale = Vector3.one;
+                // if has rigidbody, disable it
+                Rigidbody rb = newItem.GetComponent<Rigidbody>();
+                if (rb != null)
+                {
+                    rb.isKinematic = true;
+                }
+
             } else {
                 hand.DetachChildren();
             }
         };
     }
 
-    void Update()
-    {
+
+
+    void Movment() {
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
 
@@ -85,5 +95,46 @@ public class NavMeshPlayerController : MonoBehaviour
             Quaternion targetRotation = Quaternion.LookRotation(facingDirection);
             transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
         }
+    }
+    private float lastThrowTime;
+    private float cooldownTime = 0.5f; // 10 frames at 20 FPS
+
+    void ItemPickup() {
+        if (Time.time - lastThrowTime < cooldownTime) return;
+
+        Collider[] colliders = Physics.OverlapSphere(transform.position, 1f);
+
+        PickableItem[] items = colliders.Select(collider => collider.GetComponent<PickableItem>()).Where(item => item != null).ToArray();
+
+        if (items.Length > 0)
+        {
+            PickableItem closestItem = items.OrderBy(item => Vector3.Distance(transform.position, item.transform.position)).First();
+            Debug.DrawLine(transform.position, closestItem.transform.position, Color.red);
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                inventory.InventoryItem = closestItem.gameObject;
+            }
+        }   
+    }
+
+    void ItemThrow() {
+        if(inventory.InventoryItem != null && Input.GetKeyDown(KeyCode.E)) {
+            GameObject item = inventory.InventoryItem;
+            inventory.InventoryItem = null;
+            Rigidbody rb = item.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.isKinematic = false;
+                rb.AddForce(transform.forward * 10f, ForceMode.Impulse);
+            }
+            lastThrowTime = Time.time;
+        }
+    }
+
+    void Update()
+    {
+        Movment();
+        ItemThrow();
+        ItemPickup();
     }
 }

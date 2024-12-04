@@ -5,42 +5,36 @@ using UnityEngine.UI;
 
 public class HoverIcon : MonoBehaviour
 {
+    public Image iconImage;
+    public Vector3 offset;
+    private Camera mainCamera;
+    public bool isVisible = false;
 
-    public List<Sprite> icons = new();
-    public Image image;
-    public Transform followedTransform;
-    public Vector3 overhead;
-
-    private Camera cameraObject;
-
-    private Image background;
-
-    public void ChangeIcon(int id)
+    void Start()
     {
-        image.sprite = icons[id];
-    }
-
-    public void ChangeRed(float val)
-    {
-        background.color = Color.Lerp(Color.white, Color.red, val);
-    }
-
-    public void ChangeIconVisibility(bool visible)
-    {
-        image.enabled = visible;
-        background.enabled = visible;
-        transform.GetComponent<Image>().enabled = visible;
-    }
-
-    private void Start()
-    {
-        image = transform.GetChild(0).GetChild(0).GetComponent<Image>();
-        cameraObject = GameObject.Find("Main Camera").GetComponent<Camera>();
-        background = transform.GetChild(0).GetComponent<Image>();
+        mainCamera = GameObject.Find("Camera").GetComponent<Camera>();
+        iconImage.enabled = false;
     }
 
     void Update()
     {
-        transform.position = followedTransform.position + overhead;
+        if (isVisible)
+        {
+            Vector3 screenPosition = mainCamera.WorldToScreenPoint(transform.position + offset);
+            iconImage.transform.position = screenPosition;
+        }
+    }
+
+    public void ShowIcon(Sprite newIcon)
+    {
+        iconImage.sprite = newIcon;
+        iconImage.enabled = true;
+        isVisible = true;
+    }
+
+    public void HideIcon()
+    {
+        iconImage.enabled = false;
+        isVisible = false;
     }
 }

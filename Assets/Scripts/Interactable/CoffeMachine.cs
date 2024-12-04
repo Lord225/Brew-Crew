@@ -8,6 +8,7 @@ public class CoffeMachine : MonoBehaviour
     void Start()
     {
         coffeMachineInteractionDistance = GetComponent<SphereCollider>();
+        
 
         
     }
