@@ -18,6 +18,18 @@ public class Inventory : MonoBehaviour
         }
     }
 
+    public static void SwapItems(Inventory item1, Inventory item2)
+    {
+        GameObject temp1 = item1.InventoryItem;
+        item1.InventoryItem = item2.InventoryItem;
+        item2.InventoryItem = temp1;
+    }
+
+    public void swapItems(Inventory item)
+    {
+        SwapItems(this, item);
+    }
+
     public delegate void InventoryItemChanged(GameObject newItem);
     public event InventoryItemChanged OnInventoryItemChanged;
 

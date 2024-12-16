@@ -99,25 +99,10 @@ public class NavMeshPlayerController : MonoBehaviour
     private float lastThrowTime;
     private float cooldownTime = 0.5f; // 10 frames at 20 FPS
 
-    void ItemPickup() {
+    void ItemThrow() {
         if (Time.time - lastThrowTime < cooldownTime) return;
 
-        Collider[] colliders = Physics.OverlapSphere(transform.position, 1f);
 
-        PickableItem[] items = colliders.Select(collider => collider.GetComponent<PickableItem>()).Where(item => item != null).ToArray();
-
-        if (items.Length > 0)
-        {
-            PickableItem closestItem = items.OrderBy(item => Vector3.Distance(transform.position, item.transform.position)).First();
-            Debug.DrawLine(transform.position, closestItem.transform.position, Color.red);
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                inventory.InventoryItem = closestItem.gameObject;
-            }
-        }   
-    }
-
-    void ItemThrow() {
         if(inventory.InventoryItem != null && Input.GetKeyDown(KeyCode.E)) {
             GameObject item = inventory.InventoryItem;
             inventory.InventoryItem = null;
@@ -131,10 +116,37 @@ public class NavMeshPlayerController : MonoBehaviour
         }
     }
 
+    void InteractWithObjects() {
+        if (Time.time - lastThrowTime < cooldownTime) return;
+
+        Collider[] colliders = Physics.OverlapSphere(transform.position, 1f);
+
+        Interactable[] machines = colliders.Select(collider => collider.GetComponent<Interactable>()).Where(coffeMachine => coffeMachine != null).ToArray();
+
+        PickableItem[] items = colliders.Select(collider => collider.GetComponent<PickableItem>()).Where(item => item != null).ToArray();
+
+
+        if(items.Length > 0 && Input.GetKeyDown(KeyCode.E) && inventory.InventoryItem == null) {
+            var closestItem = items.OrderBy(item => Vector3.Distance(transform.position, item.transform.position)).First();
+            inventory.InventoryItem = closestItem.gameObject;
+            return;
+        }
+
+        // get closest machine
+        var closestMachine = machines.Where(machine => machine.tryInteract(inventory)).OrderBy(machine => Vector3.Distance(transform.position, machine.transform.position)).FirstOrDefault();
+
+        if (closestMachine != null && Input.GetKeyDown(KeyCode.E))
+        {
+            closestMachine.Interact(inventory);
+        } else {
+            ItemThrow();
+        }
+
+    }
+
     void Update()
     {
         Movment();
-        ItemThrow();
-        ItemPickup();
+        InteractWithObjects();
     }
 }
