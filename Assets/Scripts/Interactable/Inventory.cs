@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Inventory : MonoBehaviour
@@ -13,11 +14,49 @@ public class Inventory : MonoBehaviour
             if (value != inventoryItem)
             {
                 inventoryItem = value;
+                if (inventoryItem != null)
+                {
+                    if(inventoryItem.TryGetComponent(out PickableItem pickableItem))
+                    {
+                        pickableItem.owner = this;
+                    }
+                }
                 OnInventoryItemChanged?.Invoke(inventoryItem);
             }
         }
     }
 
+    public T GetInventoryItemComponent<T>() where T : Component
+    {
+        if (inventoryItem != null)
+        {
+            return inventoryItem.GetComponent<T>();
+        }
+        return null;
+    }
+
+    public bool TryGetInventoryItemComponent<T>(out T component) where T : Component
+    {
+        component = GetInventoryItemComponent<T>();
+        return component != null;
+    }
+
+    public GameObject DropItem()
+    {
+        Debug.Log("Dropping item");
+        if (inventoryItem != null)
+        {
+            Debug.Log("Item is not null");
+            if(inventoryItem.TryGetComponent(out PickableItem pickableItem))
+            {
+                pickableItem.owner = null;
+            }
+            GameObject item = inventoryItem;
+            InventoryItem = null;
+            return item;
+        }
+        return null;
+    }
     public static void SwapItems(Inventory item1, Inventory item2)
     {
         GameObject temp1 = item1.InventoryItem;

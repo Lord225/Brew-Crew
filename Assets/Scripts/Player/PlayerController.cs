@@ -102,12 +102,9 @@ public class NavMeshPlayerController : MonoBehaviour
     void ItemThrow() {
         if (Time.time - lastThrowTime < cooldownTime) return;
 
-
         if(inventory.InventoryItem != null && Input.GetKeyDown(KeyCode.E)) {
-            GameObject item = inventory.InventoryItem;
-            inventory.InventoryItem = null;
-            Rigidbody rb = item.GetComponent<Rigidbody>();
-            if (rb != null)
+            GameObject item = inventory.DropItem();
+            if (item.TryGetComponent(out Rigidbody rb))
             {
                 rb.isKinematic = false;
                 rb.AddForce(transform.forward * 10f, ForceMode.Impulse);
@@ -123,8 +120,7 @@ public class NavMeshPlayerController : MonoBehaviour
 
         Interactable[] machines = colliders.Select(collider => collider.GetComponent<Interactable>()).Where(coffeMachine => coffeMachine != null).ToArray();
 
-        PickableItem[] items = colliders.Select(collider => collider.GetComponent<PickableItem>()).Where(item => item != null).ToArray();
-
+        PickableItem[] items = colliders.Select(collider => collider.GetComponent<PickableItem>()).Where(item => item != null && item.owner == null).ToArray();
 
         if(items.Length > 0 && Input.GetKeyDown(KeyCode.E) && inventory.InventoryItem == null) {
             var closestItem = items.OrderBy(item => Vector3.Distance(transform.position, item.transform.position)).First();
@@ -140,6 +136,11 @@ public class NavMeshPlayerController : MonoBehaviour
             closestMachine.Interact(inventory);
         } else {
             ItemThrow();
+        }
+
+        if (closestMachine != null && Input.GetKeyDown(KeyCode.Space))
+        {
+            closestMachine.Use();
         }
 
     }
