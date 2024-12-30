@@ -1,7 +1,8 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 
-public class SteamedMilk : MonoBehaviour
+public class SteamedMilk : PickableItem
 { 
 
     public GameObject spilledMilkObject;
@@ -18,7 +19,7 @@ public class SteamedMilk : MonoBehaviour
         if (Math.Abs(Vector3.Dot(transform.up, Vector3.down)) > 0.5 || Vector3.Dot(transform.right, Vector3.down) > 0.5)
         {
             flippedFrames++;
-            if (flippedFrames > 20)
+            if (flippedFrames > 3)
             {
                 // instantiate spilled milk object on ground and destroy this object
                 RaycastHit hit;

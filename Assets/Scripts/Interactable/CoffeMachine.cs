@@ -41,12 +41,13 @@ public class CoffeMachine : Interactable
     }
 
     void UpdateState() {
-        Debug.Log("UpdateState");
-
         // Interrupt brewing if necessary
         if (brewTimer > 0) {
-            Debug.Log("Interrupted");
             brewTimer = 0;
+        }
+
+        if(state == CoffeMachineState.Brewed) {
+            return;
         }
 
         if (inventory.InventoryItem == null) {
@@ -73,8 +74,6 @@ public class CoffeMachine : Interactable
     }
 
     void Run(Inventory item) {
-        Debug.Log("Run");
-
         if (state == CoffeMachineState.CoffeInside && item.GetInventoryItemComponent<MugState>() != null) {
             brewTimer = brewTime;
             state = CoffeMachineState.Brewed;

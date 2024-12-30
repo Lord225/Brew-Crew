@@ -41,6 +41,16 @@ public class Inventory : MonoBehaviour
         return component != null;
     }
 
+    public bool hasItem()
+    {
+        return inventoryItem != null;
+    }
+
+    public bool isEmpty()
+    {
+        return inventoryItem == null;
+    }
+
     public GameObject DropItem()
     {
         Debug.Log("Dropping item");

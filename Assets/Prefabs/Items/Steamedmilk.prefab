@@ -58,9 +58,6 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5e79d3adfb18c6845832277b96a7822e, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 824869898983365750}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5e79d3adfb18c6845832277b96a7822e, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 5336857757533267372}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5e79d3adfb18c6845832277b96a7822e, type: 3}
       insertIndex: -1
@@ -74,19 +71,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 5e79d3adfb18c6845832277b96a7822e, type: 3}
   m_PrefabInstance: {fileID: 6473176104376079230}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &824869898983365750
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6130593777631309359}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1d1cf642fa6af634dbc662f496bfc110, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  owner: {fileID: 0}
 --- !u!114 &5336857757533267372
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -99,7 +83,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7e80f7b04f23a046a07de238dda9165, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spilledMilkObject: {fileID: 0}
+  owner: {fileID: 0}
+  spilledMilkObject: {fileID: 7352193165182685034, guid: e45ff248bacb81544b4e250d585592da, type: 3}
 --- !u!54 &4126458176324860705
 Rigidbody:
   m_ObjectHideFlags: 0
