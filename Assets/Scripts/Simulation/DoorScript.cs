@@ -23,7 +23,7 @@ public class DoorScript : MonoBehaviour
 
     public GameObject clientPrefab;
     private Animator animator;
-    private Transform spawn;
+    public Transform spawn;
 
     void Awake()
     {
@@ -31,13 +31,17 @@ public class DoorScript : MonoBehaviour
         spawn = transform.Find("Spawn");
     }
 
-    public void SpawnClient()
+    public ClientScript SpawnClient()
     {
         if (clientPrefab != null)
         {
-            Instantiate(clientPrefab, spawn.position, spawn.rotation);
+            var client = Instantiate(clientPrefab, spawn.position, spawn.rotation);
             PlayAnimation();
+
+            return client.GetComponent<ClientScript>();
         }
+
+        return null;
     }
 
     private void PlayAnimation()

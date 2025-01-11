@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5099808863282200697}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Spawn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40,7 +40,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 277454771326891609}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: door
   m_TagString: Door
   m_Icon: {fileID: 0}
@@ -115,6 +115,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: doors1
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 408b5c845270acb468052b71c925439c, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -150,6 +154,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   clientPrefab: {fileID: 5053940392907137075, guid: 30b4e1d944d0bf842a41328a9ba7b788, type: 3}
+  spawn: {fileID: 0}
 --- !u!95 &8385375164943603722
 Animator:
   serializedVersion: 7

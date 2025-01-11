@@ -48,7 +48,9 @@ public class IconScript : MonoBehaviour
             else
                 icon.SetActive(false);
 
-            icon.GetComponentInChildren<Text>().text = description;
+            var text = icon.GetComponentInChildren<Text>();
+            if(text != null)
+                text.text = description;
         }
     }
 

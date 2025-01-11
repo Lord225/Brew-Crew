@@ -16,7 +16,7 @@ public class ClientScript : MonoBehaviour
         Wardering,
     }
 
-    public MugState.State requestedMug;
+    public OrderController.Order order;
     public State currentState;
     public TableScript targetTable;
     private OrderController orderController;
@@ -56,6 +56,7 @@ public class ClientScript : MonoBehaviour
     void Update()
     {
         resetAnimations();
+
         switch (currentState)
         {
             case State.Spawned:
@@ -95,6 +96,12 @@ public class ClientScript : MonoBehaviour
         var lerp = Mathf.InverseLerp(orderTime, limit, time);
     
         icon.color = Color.Lerp(beginColor, endColor, lerp);
+
+        if (time > limit)
+        {
+            Debug.Log("Client waited too long for the order");
+            SetStateToLeave();
+        }
     }
 
 
@@ -143,10 +150,31 @@ public class ClientScript : MonoBehaviour
             .OrderBy(tableScript => Vector3.Distance(transform.position, tableScript.transform.position) + Random.Range(0f, 1f))
             .FirstOrDefault();
 
-        if (targetTable != null)
+        if (targetTable != null) {
+            order.table = targetTable;
+            targetTable.client = this;
             targetTable.SetEmpty(false);
+        }
         else 
             currentState = State.Wardering;
+    }
+
+    private void FindClosestDoor()
+    {
+        GameObject[] doors = GameObject.FindGameObjectsWithTag("Door");
+
+        var closestDoor = doors
+            .Select(door => door.GetComponentInChildren<DoorScript>())
+            .Where(door => door != null)
+            .OrderBy(door => Vector3.Distance(transform.position, door.transform.position) + Random.Range(0f, 1f))
+            .FirstOrDefault();
+
+        if (closestDoor != null)
+        {
+            navMeshAgent.SetDestination(closestDoor.spawn.position);
+        } else {
+            Destroy(gameObject);
+        }
     }
 
     private void GoToTable()
@@ -165,7 +193,7 @@ public class ClientScript : MonoBehaviour
         if (targetTable != null)
         {
             Debug.Log("Making order");
-            requestedMug = orderController.AddOrder(targetTable);
+            orderController.AddOrder(targetTable);
             targetTable.client = this;
             currentState = State.WaitingForOrder;
         }
@@ -186,8 +214,7 @@ public class ClientScript : MonoBehaviour
     {
         // Logic for leaving
         // if reached the door, destroy
-        if (navMeshAgent.remainingDistance < 1.5f)
-        {
+        if (navMeshAgent.remainingDistance < 0.1f){
             Destroy(gameObject);
         }
     }
@@ -200,7 +227,10 @@ public class ClientScript : MonoBehaviour
 
     public void SetStateToLeave()
     {
+        FindClosestDoor();
+
         currentState = State.Leaving;
+        // set destination to the door
 
         // set the table to empty
         if (targetTable != null)

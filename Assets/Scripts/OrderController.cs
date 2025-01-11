@@ -2,90 +2,113 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using static OrderController;
+using Unity.VisualScripting;
+using System.Linq;
 
 public class OrderController : MonoBehaviour
 {
     [System.Serializable]
-    public class Difficulty
+    public class Timing
     {
-        public int level;
-        public List<MugState.State> states;
-        public float minTime;
-        public float maxTime;
+        public float timestamp;
+        public MugState.State mugState;
+        public float waitTime;
     }
 
-    public List<Difficulty> difficulties = new List<Difficulty>
+    public List<Timing> timings = new List<Timing>
     {
-        new Difficulty { level = 1, states = new List<MugState.State> { MugState.State.Expresso }, minTime = 5.0f, maxTime = 10.0f },
-        new Difficulty { level = 2, states = new List<MugState.State> { MugState.State.Expresso, MugState.State.DoubleExpresso, MugState.State.Americano }, minTime = 5.0f, maxTime = 10.0f },
-        new Difficulty { level = 3, states = new List<MugState.State> { MugState.State.Expresso, MugState.State.FlatWhite }, minTime = 5.0f, maxTime = 10.0f },
-        new Difficulty { level = 4, states = new List<MugState.State> { MugState.State.Expresso, MugState.State.Latte }, minTime = 5.0f, maxTime = 10.0f },
-        new Difficulty { level = 5, states = new List<MugState.State> { MugState.State.Expresso, MugState.State.DoubleExpresso, MugState.State.Americano, MugState.State.Latte, MugState.State.Cappuccino }, minTime = 5.0f, maxTime = 10.0f },
-        new Difficulty { level = 6, states = new List<MugState.State> { MugState.State.Expresso, MugState.State.DoubleExpresso, MugState.State.Americano, MugState.State.Latte, MugState.State.Cappuccino, MugState.State.FlatWhite, MugState.State.Mocha }, minTime = 5.0f, maxTime = 10.0f },
-        new Difficulty { level = 7, states = new List<MugState.State> { MugState.State.Expresso, MugState.State.DoubleExpresso, MugState.State.Americano, MugState.State.Latte, MugState.State.Cappuccino, MugState.State.FlatWhite, MugState.State.Mocha, MugState.State.Macchiato }, minTime = 5.0f, maxTime = 10.0f }
+        new Timing { timestamp = 10.0f,  mugState = MugState.State.Expresso, waitTime = 60.0f},
+        new Timing { timestamp = 40.0f, mugState = MugState.State.Expresso, waitTime = 15.0f },
+        new Timing { timestamp = 50.0f, mugState = MugState.State.DoubleExpresso, waitTime = 30.0f },
+        
+        new Timing { timestamp = 60.0f, mugState = MugState.State.Americano, waitTime = 15.0f },
+        new Timing { timestamp = 65.0f,  mugState = MugState.State.Expresso, waitTime = 15.0f},
+        new Timing { timestamp = 66.0f,  mugState = MugState.State.Expresso, waitTime = 15.0f},
+
+        new Timing { timestamp = 75.0f,  mugState = MugState.State.Americano, waitTime = 15.0f},
+        new Timing { timestamp = 77.0f,  mugState = MugState.State.DoubleExpresso, waitTime = 20.0f},
+
+        new Timing { timestamp = 80.0f, mugState = MugState.State.FlatWhite, waitTime = 45.0f},
+        new Timing { timestamp = 85.0f, mugState = MugState.State.FlatWhite, waitTime = 20.0f},
+        new Timing { timestamp = 90.0f, mugState = MugState.State.FlatWhite, waitTime = 20.0f},
+
+        new Timing { timestamp = 91.0f, mugState = MugState.State.Expresso, waitTime = 5.0f},
+        new Timing { timestamp = 92.0f, mugState = MugState.State.Expresso, waitTime = 5.0f},
+
+
     };
 
-    [System.Serializable]
-    public class DifficultyTiming
-    {
-        public float timeInSeconds;
-        public int peopleToSpawn;
-        public int difficultyLevel;
-    }
-
-    public List<DifficultyTiming> difficultyTimings = new List<DifficultyTiming>
-    {
-        new DifficultyTiming { timeInSeconds = 0.0f,  peopleToSpawn = 1, difficultyLevel = 1, },
-        new DifficultyTiming { timeInSeconds = 15.0f, peopleToSpawn = 1, difficultyLevel = 1, },
-        new DifficultyTiming { timeInSeconds = 20.0f, peopleToSpawn = 2, difficultyLevel = 1,  },
-        new DifficultyTiming { timeInSeconds = 30.0f, peopleToSpawn = 1, difficultyLevel = 2,  },
-        new DifficultyTiming { timeInSeconds = 31.0f, peopleToSpawn = 1, difficultyLevel = 2,  },
-        new DifficultyTiming { timeInSeconds = 32.0f, peopleToSpawn = 1, difficultyLevel = 2,  },
-        new DifficultyTiming { timeInSeconds = 40.0f, peopleToSpawn = 1, difficultyLevel = 3,  },
-        new DifficultyTiming { timeInSeconds = 45.0f, peopleToSpawn = 1, difficultyLevel = 3,  },
-        new DifficultyTiming { timeInSeconds = 50.0f, peopleToSpawn = 1, difficultyLevel = 3,  },
-        new DifficultyTiming { timeInSeconds = 360.0f, peopleToSpawn = 1, difficultyLevel = 1,  },
-        new DifficultyTiming { timeInSeconds = 420.0f, peopleToSpawn = 1, difficultyLevel = 1,  }
-    };
     public float elapsedTime = 0.0f;
     public int currentTimingIndex = 0;
-    public int difficulty = 1;
-
 
     public Order GetOrderForTable(TableScript tableScript) {
-        return orders.Find(o => o.table == tableScript);
+        var order = orders.Find(o => o.table == tableScript);
+
+        if(order == null) {
+            AddOrder(tableScript);
+            return orders.Find(o => o.table == tableScript);
+        } else {   
+            return order;
+        }   
+    }
+
+    void OnValidate()
+    {
+        var timestamp = 0.0f;
+        for(int i = 0; i < timings.Count; i++) {
+            var timing = timings[i];
+            if (timing.timestamp < timestamp)
+            {
+                Debug.LogError("Timestamp order constraint not met: Index " + i + " < " + (i - 1));
+            }
+            else
+            {
+                timestamp = timing.timestamp;
+            }
+        }
     }
 
     void Update()
     {
         elapsedTime += Time.deltaTime;
-        
-        if (currentTimingIndex >= difficultyTimings.Count)
+
+        if (currentTimingIndex >= timings.Count)
         {
             return;
         }
 
-        if (elapsedTime < difficultyTimings[currentTimingIndex].timeInSeconds)
+        if (elapsedTime < timings[currentTimingIndex].timestamp)
         {
             return;
         }
+
+        var timing = timings[currentTimingIndex];
+
+        Debug.Log("Spawning client with mug state " + timing.mugState + " at timestamp " + timing.timestamp);
+
+
+        SpawnClient(timing);
         
-        var timing = difficultyTimings[currentTimingIndex];
-       
-        Debug.Log("Spawning " + timing.peopleToSpawn + " people at difficulty " + timing.difficultyLevel);
 
-        difficulty = timing.difficultyLevel;
-
-        SpawnClient();
-            
         currentTimingIndex++;
     }
 
-    void SpawnClient()
+    void SpawnClient(Timing timing)
     {
-        DoorScript table = GetRandomDoor();
+        DoorScript door = GetRandomDoor();
         
-        table.SpawnClient();
+        var client = door.SpawnClient();
+
+        if (client != null)
+        {
+            client.order = new Order
+            {
+                table = null,
+                orderTime = elapsedTime,
+                minimumServeTime = timing.waitTime,
+                requestedMug = timing.mugState
+            };
+        }
     }
 
     DoorScript GetRandomDoor()
@@ -103,40 +126,18 @@ public class OrderController : MonoBehaviour
     [System.Serializable]
     public class Order
     {
-        public TableScript table;
-        public float orderTime;
-        public float minimumServeTime;
-        public MugState.State requestedMug;
-    }
-
-    public Order CreateRandomOrder(TableScript table, int difficulty)
-    {
-        var difficultyLevel = difficulties.Find(d => d.level == difficulty);
-        if (difficultyLevel == null)
-        {
-            throw new System.ArgumentException("Invalid difficulty level");
-        }
-
-        var random = new System.Random();
-        var requestedMug = difficultyLevel.states[random.Next(difficultyLevel.states.Count)];
-
-        var order = new Order
-        {
-            table = table,
-            orderTime = Time.time,
-            requestedMug = requestedMug,
-            minimumServeTime = difficultyLevel.minTime
-        };
-
-        return order;
+        public TableScript table = null;
+        public float orderTime = 0.0f;
+        public float minimumServeTime = 100.0f;
+        public MugState.State requestedMug = MugState.State.Expresso;
     }
 
     public List<Order> orders = new List<Order>();
 
-    public MugState.State AddOrder(TableScript table)
-    {
-        var order = CreateRandomOrder(table, 1);
+    public Order AddOrder(TableScript table)
+    {  
+        var order = table.client.order;
         orders.Add(order);
-        return order.requestedMug;
+        return order;
     }
 }

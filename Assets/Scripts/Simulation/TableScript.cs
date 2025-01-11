@@ -96,7 +96,7 @@ public class TableScript : Interactable
     {
         if (item.TryGetComponent(out MugState mugState) && client != null)
         {
-            return mugState.state == client.requestedMug;
+            return mugState.state == client.order.requestedMug;
         }
 
         return false;
