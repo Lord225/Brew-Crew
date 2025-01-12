@@ -34,29 +34,10 @@ public class OrderListScript : MonoBehaviour
         foreach (var order in orders)
         {
             var orderItem = Instantiate(orderPrefab, transform);
-            orderItem.transform.SetSiblingIndex(1);
-            orderItem.GetComponentInChildren<TextMeshProUGUI>().text = MugState.StateToString(order.requestedMug);
+            orderItem.transform.SetSiblingIndex(2);
+
+            orderItem.GetComponent<OrderElementScript>().SetClient(order.table.client);
             
-            var hourglassIcon = orderItem.transform.Find("hourglass");
-            var ok = orderItem.transform.Find("Ok");
-
-            Debug.Assert(hourglassIcon != null);
-            Debug.Assert(ok != null);
-
-
-            if(order.table.client != null) {
-                if(order.table.client.isWaitingForOrder()) {
-                    hourglassIcon.gameObject.SetActive(false);
-                    ok.gameObject.SetActive(true);
-                } else if(order.table.client.isEating()) {
-                    hourglassIcon.gameObject.SetActive(true);
-                    ok.gameObject.SetActive(false);
-                } else {
-                    hourglassIcon.gameObject.SetActive(false);
-                    ok.gameObject.SetActive(false);
-                }
-            } 
-
             orderItems.Add(orderItem);
         }
     }
