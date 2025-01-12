@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 public class IconScript : MonoBehaviour
@@ -48,9 +49,16 @@ public class IconScript : MonoBehaviour
             else
                 icon.SetActive(false);
 
-            var text = icon.GetComponentInChildren<Text>();
-            if(text != null)
-                text.text = description;
+            var text = icon.GetComponentInChildren<TextMeshProUGUI>();
+            if(text != null) {
+                if (description != "")
+                    text.enabled = true;
+                else
+                    text.enabled = false;
+        
+                if (text.text != description)
+                    text.text = description;
+            }
         }
     }
 

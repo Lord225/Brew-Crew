@@ -23,7 +23,36 @@ public class MugState : PickableItem
         Americano, 
         Macchiato, 
         FlatWhite,
-        Water, 
+        Water,
+    }
+
+    public static string StateToString(State state)
+    {
+        switch (state)
+        {
+            case State.Empty:
+                return "Empty";
+            case State.Expresso:
+                return "Espresso";
+            case State.DoubleExpresso:
+                return "DoubleEspresso";
+            case State.Latte:
+                return "Latte";
+            case State.Cappuccino:
+                return "Cappuccino";
+            case State.Mocha:
+                return "Mocha";
+            case State.Americano:
+                return "Americano";
+            case State.Macchiato:
+                return "Macchiato";
+            case State.FlatWhite:
+                return "FlatWhite";
+            case State.Water:
+                return "Water";
+            default:
+                return "Cup of something";
+        }
     }
 
     [SerializeField]

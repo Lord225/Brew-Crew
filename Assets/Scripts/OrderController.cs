@@ -34,8 +34,6 @@ public class OrderController : MonoBehaviour
 
         new Timing { timestamp = 91.0f, mugState = MugState.State.Expresso, waitTime = 5.0f},
         new Timing { timestamp = 92.0f, mugState = MugState.State.Expresso, waitTime = 5.0f},
-
-
     };
 
     public float elapsedTime = 0.0f;
@@ -138,6 +136,11 @@ public class OrderController : MonoBehaviour
     {  
         var order = table.client.order;
         orders.Add(order);
+        OnOrderListChange?.Invoke(orders);
         return order;
     }
+
+    public delegate void NewOrderEvent(List<Order> orders);
+
+    public event NewOrderEvent OnOrderListChange;
 }

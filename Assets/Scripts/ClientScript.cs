@@ -27,6 +27,11 @@ public class ClientScript : MonoBehaviour
 
     public Color beginColor = Color.white;
     public Color endColor = Color.red;
+    
+    public delegate void OnStateChange(State state);
+
+    public OnStateChange OnStateChangeHandler;
+
 
     void Start()
     {
@@ -101,15 +106,13 @@ public class ClientScript : MonoBehaviour
         {
             Debug.Log("Client waited too long for the order");
             SetStateToLeave();
+            OnStateChangeHandler?.Invoke(currentState);
         }
     }
 
 
     private void Wardering()
     {
-        // Logic for wardering
-        // go into random directions
-
         if (navMeshAgent.remainingDistance < 3f)
         {
             if (Random.Range(0, 100) < 10)
@@ -133,6 +136,7 @@ public class ClientScript : MonoBehaviour
         if (navMeshAgent.remainingDistance < 1.5f)
         {
             currentState = State.MakingOrder;
+            OnStateChangeHandler?.Invoke(currentState);
         }
     }
 
@@ -155,8 +159,10 @@ public class ClientScript : MonoBehaviour
             targetTable.client = this;
             targetTable.SetEmpty(false);
         }
-        else 
+        else  {
             currentState = State.Wardering;
+            OnStateChangeHandler?.Invoke(currentState);
+        }
     }
 
     private void FindClosestDoor()
@@ -172,6 +178,7 @@ public class ClientScript : MonoBehaviour
         if (closestDoor != null)
         {
             navMeshAgent.SetDestination(closestDoor.spawn.position);
+            navMeshAgent.stoppingDistance = 1.5f;
         } else {
             Destroy(gameObject);
         }
@@ -182,7 +189,9 @@ public class ClientScript : MonoBehaviour
         if (targetTable != null)
         {
             navMeshAgent.SetDestination(targetTable.transform.position);
+            navMeshAgent.stoppingDistance = 1.5f;
             currentState = State.GoingToTable;
+            OnStateChangeHandler?.Invoke(currentState);
         } else {
             FindClosestEmptyTable();
         }
@@ -196,6 +205,8 @@ public class ClientScript : MonoBehaviour
             orderController.AddOrder(targetTable);
             targetTable.client = this;
             currentState = State.WaitingForOrder;
+            icon.description = MugState.StateToString(order.requestedMug);
+            OnStateChangeHandler?.Invoke(currentState);
         }
     }
 
@@ -223,6 +234,7 @@ public class ClientScript : MonoBehaviour
     {
         Debug.Log("Client got the order");
         currentState = State.Eating;
+        OnStateChangeHandler?.Invoke(currentState);
     }
 
     public void SetStateToLeave()
@@ -230,6 +242,7 @@ public class ClientScript : MonoBehaviour
         FindClosestDoor();
 
         currentState = State.Leaving;
+        OnStateChangeHandler?.Invoke(currentState);
         // set destination to the door
 
         // set the table to empty
