@@ -223,8 +223,6 @@ public class ClientScript : MonoBehaviour
 
     private void Leave()
     {
-        // Logic for leaving
-        // if reached the door, destroy
         if (navMeshAgent.remainingDistance < 0.1f){
             Destroy(gameObject);
         }
