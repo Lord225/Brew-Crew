@@ -21838,36 +21838,75 @@ MonoBehaviour:
   - timestamp: 50
     mugState: 2
     waitTime: 30
-  - timestamp: 60
-    mugState: 6
-    waitTime: 15
   - timestamp: 65
-    mugState: 1
-    waitTime: 15
-  - timestamp: 66
-    mugState: 1
-    waitTime: 15
-  - timestamp: 75
     mugState: 6
-    waitTime: 15
-  - timestamp: 77
-    mugState: 2
-    waitTime: 20
-  - timestamp: 80
-    mugState: 8
     waitTime: 45
-  - timestamp: 85
-    mugState: 8
-    waitTime: 20
-  - timestamp: 90
-    mugState: 8
-    waitTime: 20
-  - timestamp: 91
+  - timestamp: 70
     mugState: 1
-    waitTime: 5
-  - timestamp: 92
+    waitTime: 30
+  - timestamp: 75
     mugState: 1
-    waitTime: 5
+    waitTime: 30
+  - timestamp: 100
+    mugState: 6
+    waitTime: 50
+  - timestamp: 110
+    mugState: 2
+    waitTime: 60
+  - timestamp: 120
+    mugState: 8
+    waitTime: 120
+  - timestamp: 130
+    mugState: 8
+    waitTime: 50
+  - timestamp: 150
+    mugState: 8
+    waitTime: 50
+  - timestamp: 180
+    mugState: 1
+    waitTime: 30
+  - timestamp: 200
+    mugState: 3
+    waitTime: 80
+  - timestamp: 220
+    mugState: 3
+    waitTime: 80
+  - timestamp: 250
+    mugState: 4
+    waitTime: 80
+  - timestamp: 270
+    mugState: 1
+    waitTime: 50
+  - timestamp: 300
+    mugState: 1
+    waitTime: 50
+  - timestamp: 301
+    mugState: 1
+    waitTime: 50
+  - timestamp: 305
+    mugState: 1
+    waitTime: 50
+  - timestamp: 306
+    mugState: 2
+    waitTime: 50
+  - timestamp: 307
+    mugState: 1
+    waitTime: 50
+  - timestamp: 307
+    mugState: 1
+    waitTime: 50
+  - timestamp: 307
+    mugState: 1
+    waitTime: 50
+  - timestamp: 307
+    mugState: 1
+    waitTime: 50
+  - timestamp: 307
+    mugState: 1
+    waitTime: 50
+  - timestamp: 307
+    mugState: 1
+    waitTime: 50
   elapsedTime: 0
   currentTimingIndex: 0
   orders: []
