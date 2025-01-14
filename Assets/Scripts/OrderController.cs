@@ -50,6 +50,10 @@ public class OrderController : MonoBehaviour
         }   
     }
 
+    public void OnGameFinish() {
+
+    }
+
     void OnValidate()
     {
         var timestamp = 0.0f;
@@ -86,9 +90,14 @@ public class OrderController : MonoBehaviour
 
 
         SpawnClient(timing);
-        
 
         currentTimingIndex++;
+
+        if (currentTimingIndex >= timings.Count)
+        {
+            Debug.Log("Game finished");
+            OnGameFinish();
+        }
     }
 
     void SpawnClient(Timing timing)
@@ -102,8 +111,9 @@ public class OrderController : MonoBehaviour
             client.order = new Order
             {
                 table = null,
-                orderTime = elapsedTime,
-                minimumServeTime = timing.waitTime,
+                spawnTime = elapsedTime,
+                orderTime = 0.0f,
+                waitTime = timing.waitTime,
                 requestedMug = timing.mugState
             };
         }
@@ -125,8 +135,9 @@ public class OrderController : MonoBehaviour
     public class Order
     {
         public TableScript table = null;
+        public float spawnTime = 0.0f;
         public float orderTime = 0.0f;
-        public float minimumServeTime = 100.0f;
+        public float waitTime = 100.0f;
         public MugState.State requestedMug = MugState.State.Expresso;
     }
 
@@ -135,9 +146,17 @@ public class OrderController : MonoBehaviour
     public Order AddOrder(TableScript table)
     {  
         var order = table.client.order;
+        order.orderTime = elapsedTime;
         orders.Add(order);
         OnOrderListChange?.Invoke(orders);
         return order;
+    }
+
+    public void RemoveOrder(TableScript table)
+    {
+        var order = orders.Find(o => o.table == table);
+        orders.Remove(order);
+        OnOrderListChange?.Invoke(orders);
     }
 
     public delegate void NewOrderEvent(List<Order> orders);

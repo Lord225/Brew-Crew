@@ -32,7 +32,6 @@ public class ClientScript : MonoBehaviour
 
     public OnStateChange OnStateChangeHandler;
 
-
     void Start()
     {
         currentState = State.Spawned;
@@ -94,32 +93,45 @@ public class ClientScript : MonoBehaviour
     void WaitingForOrder() {
         var myorder = orderController.GetOrderForTable(targetTable);
 
-        var limit = myorder.minimumServeTime;
-        var orderTime = myorder.orderTime;
-        var time = orderController.elapsedTime;
+        var limit = myorder.waitTime; // for how long client can wait for the order
+        var orderTime = myorder.orderTime; // when the order was made
+        var time = orderController.elapsedTime; // current time
 
-        var lerp = Mathf.InverseLerp(orderTime, limit, time);
-    
+        var lerp = Mathf.InverseLerp(orderTime, orderTime + limit, time);
         icon.color = Color.Lerp(beginColor, endColor, lerp);
 
-        if (time > limit)
+        var timePassed = time - orderTime;
+
+        if (timePassed > limit)
         {
-            Debug.Log("Client waited too long for the order");
+            Debug.Log("Client waited too long for the order (" + order.requestedMug + ") time " + time + " orderTime " + orderTime + " limit " + limit); 
             SetStateToLeave();
-            OnStateChangeHandler?.Invoke(currentState);
         }
     }
 
 
     private void Wardering()
     {
-        if (navMeshAgent.remainingDistance < 3f)
+        navMeshAgent.stoppingDistance = 0.05f;
+        if (navMeshAgent.remainingDistance < 0.1f)
         {
             if (Random.Range(0, 100) < 10)
             {
                 SetStateToLeave();
                 return;
             }
+             FindClosestEmptyTable();
+
+             
+            if (targetTable != null)
+            {
+                navMeshAgent.SetDestination(targetTable.transform.position);
+                navMeshAgent.stoppingDistance = 1.7f;
+                currentState = State.GoingToTable;
+                OnStateChangeHandler?.Invoke(currentState);
+                return;
+            }
+            
 
             var randomDirection = Random.insideUnitSphere * 10;
             randomDirection += transform.position;
@@ -128,12 +140,13 @@ public class ClientScript : MonoBehaviour
             {
                 navMeshAgent.SetDestination(hit.position);
             }
+
         } 
     }
 
     private void GoingToTable()
     {
-        if (navMeshAgent.remainingDistance < 1.5f)
+        if (navMeshAgent.remainingDistance < 2.0f)
         {
             currentState = State.MakingOrder;
             OnStateChangeHandler?.Invoke(currentState);
@@ -147,6 +160,7 @@ public class ClientScript : MonoBehaviour
         if(targetTable != null)
             targetTable.SetEmpty(true);
 
+        targetTable = null;
 
         targetTable = tables
             .Select(table => table.GetComponent<TableScript>())
@@ -156,32 +170,24 @@ public class ClientScript : MonoBehaviour
 
         if (targetTable != null) {
             order.table = targetTable;
-            targetTable.client = this;
             targetTable.SetEmpty(false);
+            targetTable.client = this;
         }
-        else  {
+        else  if (currentState != State.Wardering) {
             currentState = State.Wardering;
             OnStateChangeHandler?.Invoke(currentState);
         }
     }
 
-    private void FindClosestDoor()
+    private DoorScript FindClosestDoor()
     {
         GameObject[] doors = GameObject.FindGameObjectsWithTag("Door");
 
-        var closestDoor = doors
+        return doors
             .Select(door => door.GetComponentInChildren<DoorScript>())
             .Where(door => door != null)
             .OrderBy(door => Vector3.Distance(transform.position, door.transform.position) + Random.Range(0f, 1f))
             .FirstOrDefault();
-
-        if (closestDoor != null)
-        {
-            navMeshAgent.SetDestination(closestDoor.spawn.position);
-            navMeshAgent.stoppingDistance = 1.5f;
-        } else {
-            Destroy(gameObject);
-        }
     }
 
     private void GoToTable()
@@ -189,7 +195,7 @@ public class ClientScript : MonoBehaviour
         if (targetTable != null)
         {
             navMeshAgent.SetDestination(targetTable.transform.position);
-            navMeshAgent.stoppingDistance = 1.5f;
+            navMeshAgent.stoppingDistance = 1.7f;
             currentState = State.GoingToTable;
             OnStateChangeHandler?.Invoke(currentState);
         } else {
@@ -201,8 +207,9 @@ public class ClientScript : MonoBehaviour
     {
         if (targetTable != null)
         {
-            Debug.Log("Making order");
-            orderController.AddOrder(targetTable);
+            var updatedOrder = orderController.AddOrder(targetTable);
+            order = updatedOrder;
+            Debug.Log("Making order for table " + targetTable.name + " order time: " + order.orderTime + " wait time: " + order.waitTime + " requested mug: " + order.requestedMug);
             targetTable.client = this;
             currentState = State.WaitingForOrder;
             icon.description = MugState.StateToString(order.requestedMug);
@@ -223,7 +230,7 @@ public class ClientScript : MonoBehaviour
 
     private void Leave()
     {
-        if (navMeshAgent.remainingDistance < 0.1f){
+        if (navMeshAgent.remainingDistance < 0.5f){
             Destroy(gameObject);
         }
     }
@@ -237,17 +244,24 @@ public class ClientScript : MonoBehaviour
 
     public void SetStateToLeave()
     {
-        FindClosestDoor();
-
-        currentState = State.Leaving;
-        OnStateChangeHandler?.Invoke(currentState);
-        // set destination to the door
-
         // set the table to empty
         if (targetTable != null)
         {
+            orderController.RemoveOrder(targetTable);  
             targetTable.SetEmpty(true);
-            targetTable.client = null;
+            targetTable = null;
         }
+
+        var door = FindClosestDoor();
+
+        if (door != null)
+        {
+            navMeshAgent.SetDestination(door.spawn.position);
+            navMeshAgent.stoppingDistance = 0.05f;
+
+        
+            currentState = State.Leaving;
+            OnStateChangeHandler?.Invoke(currentState);
+        } 
     }
 }

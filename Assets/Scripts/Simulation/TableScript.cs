@@ -105,7 +105,11 @@ public class TableScript : Interactable
     public void SetEmpty(bool empty)
     {
         IsEmpty = empty;
-        if(empty)
+        if(empty) {
+            Debug.Log("Clearing table"); 
+            client.order = null;
+            client = null;
             Destroy(inventory.DropItem());
+        }
     }
 }

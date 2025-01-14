@@ -1,4 +1,5 @@
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using static ClientScript;
 
@@ -8,12 +9,15 @@ public class OrderElementScript : MonoBehaviour
     private Transform  hourglassIcon;
     private Transform ok;
 
-    void updateIcon(State state) {
-        Debug.Log("Updating icon - " + state);
-        if (state == State.WaitingForOrder) {
+    void updateIcon(ClientScript.State state) {
+        if(client.IsDestroyed() || this.IsDestroyed()) {
+            return;
+        }
+
+        if (state == ClientScript.State.WaitingForOrder) {
             hourglassIcon.gameObject.SetActive(true);
             ok.gameObject.SetActive(false);
-        } else if (state == State.Eating) {
+        } else if (state == ClientScript.State.Eating) {
             hourglassIcon.gameObject.SetActive(false);
             ok.gameObject.SetActive(true);
         } else {
@@ -35,16 +39,15 @@ public class OrderElementScript : MonoBehaviour
             Debug.LogError("No text component found");
         }
      
-        client.OnStateChangeHandler += (State newState) =>
-        {
-            updateIcon(newState);
-        };
+        client.OnStateChangeHandler += updateIcon;
 
         updateIcon(client.currentState);
     }
 
     void OnDestroy()
     {
-        client.OnStateChangeHandler = null;
+        if(client != null) {
+            client.OnStateChangeHandler -= updateIcon;
+        }
     }
 }
