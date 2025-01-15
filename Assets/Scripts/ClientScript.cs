@@ -22,11 +22,15 @@ public class ClientScript : MonoBehaviour
     private OrderController orderController;
     private NavMeshAgent navMeshAgent;
     private Animator animator;
+    private AudioSource audio;
 
     private IconScript icon;
 
     public Color beginColor = Color.white;
     public Color endColor = Color.red;
+
+    public AudioClip orderSound;
+    public AudioClip eatSound;
     
     public delegate void OnStateChange(State state);
 
@@ -39,11 +43,13 @@ public class ClientScript : MonoBehaviour
         navMeshAgent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
         icon = GetComponent<IconScript>();
+        audio = GetComponent<AudioSource>();
 
         Debug.Assert(orderController != null);
         Debug.Assert(navMeshAgent != null);
         Debug.Assert(animator != null);
         Debug.Assert(icon != null);
+        Debug.Assert(audio != null);
 
         // set layers used by navMeshAgent ()
 
@@ -219,12 +225,22 @@ public class ClientScript : MonoBehaviour
 
     private void Eat()
     {
-        StartCoroutine(EatAndLeave());
+
     }
 
     private IEnumerator EatAndLeave()
     {
-        yield return new WaitForSeconds(Random.Range(5, 10));
+        // play Eat sound and collect sound
+        if (!audio.isPlaying)
+        {
+            audio.PlayOneShot(orderSound);
+        }
+        yield return new WaitForSeconds(Random.Range(1, 3));
+        if(Random.Range(0, 100) < 50)
+        {
+            audio.PlayOneShot(eatSound);
+        }
+        yield return new WaitForSeconds(Random.Range(3, 5));
         SetStateToLeave();
     }
 
@@ -239,6 +255,7 @@ public class ClientScript : MonoBehaviour
     {
         Debug.Log("Client got the order");
         currentState = State.Eating;
+        StartCoroutine(EatAndLeave());
         OnStateChangeHandler?.Invoke(currentState);
     }
 

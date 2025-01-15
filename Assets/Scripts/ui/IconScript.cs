@@ -28,6 +28,7 @@ public class IconScript : MonoBehaviour
 
         // set parent of icon to canvas
         icon.transform.SetParent(canvas.transform, false);
+        icon.transform.SetAsFirstSibling();
     }
 
     // Update is called once per frame

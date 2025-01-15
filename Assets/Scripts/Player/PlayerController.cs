@@ -9,18 +9,27 @@ public class NavMeshPlayerController : MonoBehaviour
     public float deceleration = 10f; // How quickly the player slows down
     public float turnSpeed = 720f; // Rotation speed in degrees per second
 
+
+    public AudioClip pickupSound;
+    public AudioClip dropSound;
+    public AudioClip useSound;
+
+    public AudioClip throwSound;
+
     private Vector3 accelerationDirection;
 
     private Vector3 facingDirection;
 
     private Inventory inventory;
     private Transform hand;
-    
 
+    private AudioSource audio;
+    
     void Start()
     {
         inventory = GetComponent<Inventory>();
         hand = transform.Find("Hand");
+        audio = GetComponent<AudioSource>();
 
         inventory.OnInventoryItemChanged += (GameObject newItem) =>
         {
@@ -41,6 +50,11 @@ public class NavMeshPlayerController : MonoBehaviour
                 hand.DetachChildren();
             }
         };
+
+
+        Debug.Assert(inventory != null, "Inventory component is missing");
+        Debug.Assert(hand != null, "Hand transform is missing");
+        Debug.Assert(audio != null, "Audio source is missing");
     }
 
 
@@ -110,6 +124,8 @@ public class NavMeshPlayerController : MonoBehaviour
                 rb.AddForce(transform.forward * 10f, ForceMode.Impulse);
             }
             lastThrowTime = Time.time;
+
+            audio.PlayOneShot(throwSound);
         }
     }
 
@@ -125,6 +141,7 @@ public class NavMeshPlayerController : MonoBehaviour
         if(items.Length > 0 && Input.GetKeyDown(KeyCode.E) && inventory.InventoryItem == null) {
             var closestItem = items.OrderBy(item => Vector3.Distance(transform.position, item.transform.position)).First();
             inventory.InventoryItem = closestItem.gameObject;
+            audio.PlayOneShot(pickupSound);
             return;
         }
 
@@ -134,6 +151,7 @@ public class NavMeshPlayerController : MonoBehaviour
         if (closestMachine != null && Input.GetKeyDown(KeyCode.E))
         {
             closestMachine.Interact(inventory);
+            audio.PlayOneShot(useSound);
         } else {
             ItemThrow();
         }
@@ -141,6 +159,7 @@ public class NavMeshPlayerController : MonoBehaviour
         if (closestMachine != null && Input.GetKeyDown(KeyCode.Space))
         {
             closestMachine.Use();
+            audio.PlayOneShot(useSound);
         }
 
     }
