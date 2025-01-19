@@ -1,9 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
-using static OrderController;
-using Unity.VisualScripting;
-using System.Linq;
+using System.Collections;
 
 public class OrderController : MonoBehaviour
 {
@@ -14,6 +11,8 @@ public class OrderController : MonoBehaviour
         public MugState.State mugState;
         public float waitTime;
     }
+
+    public bool driveByTime = true;
 
     public List<Timing> timings = new List<Timing>
     {
@@ -39,6 +38,22 @@ public class OrderController : MonoBehaviour
     public float elapsedTime = 0.0f;
     public int currentTimingIndex = 0;
 
+
+    public int finishedOneEspresso = 0;
+    public int finishedTwoIngredients = 0;
+    public int finishedThreeIngredients = 0;
+
+
+    private AudioSource audio;
+    public AudioClip almostFinishedSound;
+    public AudioClip gameFinishedSound;
+
+    public int totalPoints {
+        get {
+            return finishedOneEspresso + 2*finishedTwoIngredients + 3*finishedThreeIngredients;
+        }
+    }
+
     public Order GetOrderForTable(TableScript tableScript) {
         var order = orders.Find(o => o.table == tableScript);
 
@@ -50,8 +65,18 @@ public class OrderController : MonoBehaviour
         }   
     }
 
-    public void OnGameFinish() {
+    public void AlmostFinished() {
+        if(audio.isPlaying)
+            return;
 
+        audio.PlayOneShot(almostFinishedSound);
+    }
+
+
+    public void OnGameFinish() {
+        var endScreen = GameObject.Find("EndScreen").GetComponent<EndScreenScript>();
+        audio.PlayOneShot(gameFinishedSound);
+        endScreen.ShowEndScreen(totalPoints);
     }
 
     void OnValidate()
@@ -70,9 +95,39 @@ public class OrderController : MonoBehaviour
         }
     }
 
+    void Start()
+    {
+        OnOrderListChange?.Invoke(orders);
+        if(!driveByTime) {
+            StartCoroutine(DelayedStart());
+        }
+        audio = GetComponent<AudioSource>();
+    }
+
+    private IEnumerator DelayedStart()
+    {
+        yield return new WaitForSeconds(15);
+        SpawnClient(timings[currentTimingIndex]);
+        currentTimingIndex++;
+    }
+
     void Update()
     {
+        if(!driveByTime) {
+            if(currentTimingIndex == timings.Count) {
+                OnGameFinish();
+            }
+            return;
+        }
+
         elapsedTime += Time.deltaTime;
+
+
+        // if there is 9.4 seconds to the end of the game, call AlmostFinished
+        var lastTimeStamp = timings[timings.Count - 1].timestamp;
+        if (lastTimeStamp - elapsedTime < 8f && lastTimeStamp - elapsedTime > 7.9f){
+            AlmostFinished();
+        }
 
         if (currentTimingIndex >= timings.Count)
         {
@@ -152,8 +207,32 @@ public class OrderController : MonoBehaviour
         return order;
     }
 
-    public void RemoveOrder(TableScript table)
+    public void RemoveOrder(TableScript table, bool orderFinished) 
     {
+        if(!driveByTime) {
+            var timing = timings[currentTimingIndex];
+            SpawnClient(timing);
+            currentTimingIndex++;
+        }
+
+        if(orderFinished) {
+            switch(table.client.order.requestedMug) {
+                case MugState.State.Expresso:
+                case MugState.State.Empty:
+                case MugState.State.Water:
+                    finishedOneEspresso++;
+                    break;
+                case MugState.State.Americano:
+                case MugState.State.DoubleExpresso:
+                case MugState.State.FlatWhite:
+                    finishedTwoIngredients++;
+                    break;
+                case MugState.State.Cappuccino:
+                case MugState.State.Latte:
+                    finishedThreeIngredients++;
+                    break;
+            }
+        }
         var order = orders.Find(o => o.table == table);
         orders.Remove(order);
         OnOrderListChange?.Invoke(orders);

@@ -1,6 +1,4 @@
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.AI;
 
 public class CoffeMachine : Interactable
 {
@@ -28,6 +26,13 @@ public class CoffeMachine : Interactable
 
     public override bool Interact(Inventory item)
     {
+        // check if machine can be run
+        // has craftable item in it (Mug) and has state CoffeInside
+        if (Run(item))
+        {
+            return true;
+        }
+
         if (inventory.InventoryItem == null && item.InventoryItem != null)
         {
             inventory.swapItems(item);
@@ -65,13 +70,6 @@ public class CoffeMachine : Interactable
         }
         
 
-        if (inventory.InventoryItem == null) {
-            animator.SetBool("Alert", true);
-            state = CoffeMachineState.Empty;
-            return;
-        }
-
-
         var coffeSeeds = inventory.GetInventoryItemComponent<CoffeSeeds>();
         if (coffeSeeds != null) {
             state = CoffeMachineState.CoffeInside;
@@ -93,23 +91,27 @@ public class CoffeMachine : Interactable
         return true;
     }
 
-    void Run(Inventory item) {
-        if (state == CoffeMachineState.CoffeInside && item.GetInventoryItemComponent<MugState>() != null) {
+    bool Run(Inventory item) {
+        if (state == CoffeMachineState.CoffeInside && inventory.GetInventoryItemComponent<MugState>() != null) {
             brewTimer = brewTime;
             state = CoffeMachineState.Brewed;
-        } else if (state == CoffeMachineState.Brewed && item.InventoryItem == null) {
+            return true;
+        } else if (state == CoffeMachineState.Brewed && inventory.InventoryItem == null) {
             var newItem = Instantiate(brewdCoffePrefab);
-            item.InventoryItem = newItem;
+            inventory.InventoryItem = newItem;
             state = CoffeMachineState.Empty;
+            return true;
         } else if (state == CoffeMachineState.Empty) {
             // Additional logic for empty state if needed
+            return false;
         }
+
+        return false;
     }
 
     // Run 
     public override bool Use()
     {
-        Run(inventory);
         return false;
     }
 
@@ -172,7 +174,9 @@ public class CoffeMachine : Interactable
                         case MugState.State.Expresso:
                             mugState.state = MugState.State.DoubleExpresso;
                             break;
-                        // Add more cases if there are more states
+                        case MugState.State.Water:
+                            mugState.state = MugState.State.Americano;
+                            break;
                     }
                 }
             }

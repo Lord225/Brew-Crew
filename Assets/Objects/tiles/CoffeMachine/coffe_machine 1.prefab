@@ -354,11 +354,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d35b32e2f8b552498e60ec35c9bfc10, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  image: {fileID: 0}
   offset: {x: 0, y: 1.5, z: 0}
   color: {r: 1, g: 1, b: 1, a: 1}
+  sprite: {fileID: 0}
   scale: 0.5
-  mainCamera: {fileID: 0}
+  rotation: 0
+  showIcon: 1
+  description: 
 --- !u!95 &1795885378520734643
 Animator:
   serializedVersion: 7

@@ -1,8 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine.UI;
 using static OrderController;
-using TMPro;
 
 public class OrderListScript : MonoBehaviour
 {

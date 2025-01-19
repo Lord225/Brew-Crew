@@ -1,7 +1,6 @@
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
-using static ClientScript;
 
 public class OrderElementScript : MonoBehaviour
 {

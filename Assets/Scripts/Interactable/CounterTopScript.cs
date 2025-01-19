@@ -1,11 +1,11 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class CounterTopScript : Interactable
 {
     private Inventory inventory;
     public Transform slot;
+    public GameObject mugPrefab;
 
     void Start()
     {
@@ -39,7 +39,7 @@ public class CounterTopScript : Interactable
 
     CraftingRecipe.Result craftings(Inventory otherItem) {
         foreach (var recipe in craftingRecipes) {
-            if (recipe.Matches(inventory.InventoryItem, otherItem.InventoryItem)) {
+            if (recipe.Matches(inventory.InventoryItem, otherItem.InventoryItem) || recipe.Matches(otherItem.InventoryItem, inventory.InventoryItem)) {
                 return recipe.getResult();
             }
         }
@@ -71,6 +71,13 @@ public class CounterTopScript : Interactable
             Debug.Log(inventory.InventoryItem);            
             if(inventory.TryGetInventoryItemComponent(out MugState state)) {
                 state.state = craftingResult.state;
+            } else {
+                // destroy item
+                Destroy(inventory.DropItem());
+                // create mug with state
+                var mug = Instantiate(mugPrefab);
+                mug.GetComponent<MugState>().state = craftingResult.state;
+                inventory.InventoryItem = mug;
             }
 
             Destroy(otherItem.DropItem());

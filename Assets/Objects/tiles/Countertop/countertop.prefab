@@ -168,6 +168,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   slot: {fileID: 3180746168338783304}
+  mugPrefab: {fileID: 1393050236794355415, guid: 3c32af64abdb37e49a316bf2ceed3682, type: 3}
   craftingRecipes:
   - {fileID: 11400000, guid: 49530cfcf99d5a046b3fc2682ec9eef8, type: 2}
   - {fileID: 11400000, guid: 5e410cd0fe301694e87ed21bf7fb9ade, type: 2}

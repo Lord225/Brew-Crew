@@ -1,4 +1,5 @@
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -24,12 +25,14 @@ public class NavMeshPlayerController : MonoBehaviour
     private Transform hand;
 
     private AudioSource audio;
+    private Animator animator;
     
     void Start()
     {
         inventory = GetComponent<Inventory>();
         hand = transform.Find("Hand");
         audio = GetComponent<AudioSource>();
+        animator = GetComponent<Animator>();
 
         inventory.OnInventoryItemChanged += (GameObject newItem) =>
         {
@@ -50,8 +53,9 @@ public class NavMeshPlayerController : MonoBehaviour
                 hand.DetachChildren();
             }
         };
+        
 
-
+        Debug.Assert(animator != null, "Animator component is missing");
         Debug.Assert(inventory != null, "Inventory component is missing");
         Debug.Assert(hand != null, "Hand transform is missing");
         Debug.Assert(audio != null, "Audio source is missing");
@@ -128,6 +132,31 @@ public class NavMeshPlayerController : MonoBehaviour
             audio.PlayOneShot(throwSound);
         }
     }
+    
+    public GameObject outlinedObject;
+
+    void RemoveOutline() {
+        if(outlinedObject != null) {
+            outlinedObject.GetOrAddComponent<Outline>().enabled = false;
+            outlinedObject = null;
+        }
+    }
+
+    bool SetOutline(GameObject newGameObject) {
+        if (newGameObject == null) {
+            RemoveOutline();
+            return true;
+        }
+
+        if (outlinedObject == null || outlinedObject.GetInstanceID() != newGameObject.GetInstanceID()) { 
+            RemoveOutline();
+            var outline = newGameObject.GetOrAddComponent<Outline>();
+            outline.enabled = true;
+            outline.OutlineColor = new Color(1f, 0.7137254902f, 0.0f);
+            outlinedObject = newGameObject;
+        } 
+        return false;
+    }
 
     void InteractWithObjects() {
         if (Time.time - lastThrowTime < cooldownTime) return;
@@ -138,8 +167,19 @@ public class NavMeshPlayerController : MonoBehaviour
 
         PickableItem[] items = colliders.Select(collider => collider.GetComponent<PickableItem>()).Where(item => item != null && item.owner == null).ToArray();
 
-        if(items.Length > 0 && Input.GetKeyDown(KeyCode.E) && inventory.InventoryItem == null) {
-            var closestItem = items.OrderBy(item => Vector3.Distance(transform.position, item.transform.position)).First();
+        var closestItem = items.OrderBy(item => Vector3.Distance(transform.position, item.transform.position)).FirstOrDefault();
+
+        var outlineset = true;
+
+        try {
+            if(!inventory.hasItem()) {
+                outlineset = SetOutline(closestItem?.gameObject);
+            }
+        } catch(System.Exception e) {
+            Debug.Log(e);
+        }
+
+        if(closestItem != null && Input.GetKeyDown(KeyCode.E) && inventory.InventoryItem == null) {
             inventory.InventoryItem = closestItem.gameObject;
             audio.PlayOneShot(pickupSound);
             return;
@@ -147,6 +187,13 @@ public class NavMeshPlayerController : MonoBehaviour
 
         // get closest machine
         var closestMachine = machines.Where(machine => machine.tryInteract(inventory)).OrderBy(machine => Vector3.Distance(transform.position, machine.transform.position)).FirstOrDefault();
+        try {
+            if(outlineset) {
+                SetOutline(closestMachine?.gameObject);
+            }
+        } catch(System.Exception e) {
+            Debug.Log(e);
+        }
 
         if (closestMachine != null && Input.GetKeyDown(KeyCode.E))
         {
@@ -155,18 +202,16 @@ public class NavMeshPlayerController : MonoBehaviour
         } else {
             ItemThrow();
         }
+    }
 
-        if (closestMachine != null && Input.GetKeyDown(KeyCode.Space))
-        {
-            closestMachine.Use();
-            audio.PlayOneShot(useSound);
-        }
-
+    void Animatons() {
+        animator.SetFloat("speed", accelerationDirection.magnitude*0.5f);
     }
 
     void Update()
     {
         Movment();
         InteractWithObjects();
+        Animatons();
     }
 }

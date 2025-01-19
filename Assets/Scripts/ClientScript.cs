@@ -106,12 +106,19 @@ public class ClientScript : MonoBehaviour
         var lerp = Mathf.InverseLerp(orderTime, orderTime + limit, time);
         icon.color = Color.Lerp(beginColor, endColor, lerp);
 
+        // Change player color based on waiting time
+        var renderer = GetComponentInChildren<Renderer>();
+        if (renderer != null)
+        {
+            renderer.material.color = Color.Lerp(beginColor, endColor, lerp);
+        }
+
         var timePassed = time - orderTime;
 
         if (timePassed > limit)
         {
             Debug.Log("Client waited too long for the order (" + order.requestedMug + ") time " + time + " orderTime " + orderTime + " limit " + limit); 
-            SetStateToLeave();
+            SetStateToLeave(false);
         }
     }
 
@@ -123,7 +130,7 @@ public class ClientScript : MonoBehaviour
         {
             if (Random.Range(0, 100) < 10)
             {
-                SetStateToLeave();
+                SetStateToLeave(false);
                 return;
             }
              FindClosestEmptyTable();
@@ -241,7 +248,7 @@ public class ClientScript : MonoBehaviour
             audio.PlayOneShot(eatSound);
         }
         yield return new WaitForSeconds(Random.Range(3, 5));
-        SetStateToLeave();
+        SetStateToLeave(true);
     }
 
     private void Leave()
@@ -259,12 +266,12 @@ public class ClientScript : MonoBehaviour
         OnStateChangeHandler?.Invoke(currentState);
     }
 
-    public void SetStateToLeave()
+    public void SetStateToLeave(bool orderFullfiled)
     {
         // set the table to empty
         if (targetTable != null)
         {
-            orderController.RemoveOrder(targetTable);  
+            orderController.RemoveOrder(targetTable, orderFullfiled);  
             targetTable.SetEmpty(true);
             targetTable = null;
         }

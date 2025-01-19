@@ -44,7 +44,7 @@ public class MusicScript : Interactable
       return true;
   }
 
-  public override bool Use()
+  public override bool Interact(Inventory other)
   {
     Debug.Log("Interacting with music");
     if (volume < volumes.Length - 1)

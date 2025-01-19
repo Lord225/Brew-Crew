@@ -5,19 +5,20 @@ public class MilkSteamerScript : Interactable
     private Inventory inventory;
     public GameObject steamedMilkPrefab;
     public Transform slot;
+    private IconScript icon;
 
     public float steamingEnd = 1f;
 
-    public float steamOnUse = 0.1f;
+    public float steamOnUse = 0.3f;
 
-    public float steamDecrease = 0.95f;
+    public float steamDecrease = 0.995f;
 
     public float steamTimer = 0f;
-
 
     void Start()
     {
         inventory = GetComponent<Inventory>();
+        icon = GetComponent<IconScript>();
 
         inventory.OnInventoryItemChanged += (GameObject newItem) =>
         {
@@ -42,6 +43,12 @@ public class MilkSteamerScript : Interactable
 
     public override bool Interact(Inventory inventory)
     {
+        if(this.inventory.TryGetInventoryItemComponent(out Milk milk))
+        {
+            Use();
+            return true;
+        }
+
         if (inventory.InventoryItem == null && this.inventory.InventoryItem != null)
         {
             inventory.swapItems(this.inventory);
@@ -97,9 +104,15 @@ public class MilkSteamerScript : Interactable
             {
                 // decrease steam with deltatime
                 steamTimer = Mathf.Max(0, steamTimer - steamDecrease * Time.deltaTime);
+                icon.showIcon = true;
+            } else {
+                icon.showIcon = false;
             }
         } else {
             steamTimer = 0;
+            icon.showIcon = false;
         }
+        
+        icon.color = Color.Lerp(Color.white, Color.red, steamTimer / steamingEnd);
     }
 }
