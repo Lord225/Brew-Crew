@@ -23,6 +23,7 @@ public class MugState : PickableItem
         Macchiato, 
         FlatWhite,
         Water,
+        Dity,
     }
 
     public static string StateToString(State state)
@@ -49,6 +50,8 @@ public class MugState : PickableItem
                 return "FlatWhite";
             case State.Water:
                 return "Water";
+            case State.Dity:
+                return "Dirty";
             default:
                 return "Cup of something";
         }
@@ -113,6 +116,9 @@ public class MugState : PickableItem
                     break;
                 case State.FlatWhite:
                     renderer.material.color = new Color(0.95f, 0.9f, 0.85f); // Very Light Brown
+                    break;
+                case State.Dity:
+                    renderer.material.color = Color.black;
                     break;
                 case State.Water:
                     renderer.material.color = Color.blue;

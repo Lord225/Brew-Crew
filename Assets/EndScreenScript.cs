@@ -16,8 +16,6 @@ public class EndScreenScript : MonoBehaviour
         group2.alpha = 0;
         
         this.points.text = "" + points * 100;
-
-
     }
 
     public void LoadMainMenu() {

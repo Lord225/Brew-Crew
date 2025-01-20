@@ -865,7 +865,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   points: {fileID: 7480727115982872674}
   group: {fileID: 7423152887416713464}
-  group2: {fileID: 0}
+  group2: {fileID: 3738652667992886695}
 --- !u!1 &6617025179153380293
 GameObject:
   m_ObjectHideFlags: 0
@@ -901,9 +901,9 @@ RectTransform:
   - {fileID: 2695020028297908691}
   m_Father: {fileID: 7432338116916333480}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 729, y: -319}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: 441, y: -274}
   m_SizeDelta: {x: 307, y: 148}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &735986830752908295

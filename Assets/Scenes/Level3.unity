@@ -24047,46 +24047,46 @@ MonoBehaviour:
   - timestamp: 160
     mugState: 6
     waitTime: 140
-  - timestamp: 300
+  - timestamp: 200
     mugState: 3
     waitTime: 180
-  - timestamp: 300
+  - timestamp: 200
     mugState: 4
     waitTime: 200
-  - timestamp: 300
+  - timestamp: 240
     mugState: 8
     waitTime: 120
-  - timestamp: 300
+  - timestamp: 240
     mugState: 8
     waitTime: 120
-  - timestamp: 400
+  - timestamp: 260
     mugState: 2
     waitTime: 110
-  - timestamp: 400
+  - timestamp: 280
     mugState: 2
     waitTime: 110
-  - timestamp: 400
+  - timestamp: 300
     mugState: 2
     waitTime: 110
-  - timestamp: 400
+  - timestamp: 320
     mugState: 2
     waitTime: 110
-  - timestamp: 400
+  - timestamp: 350
     mugState: 2
     waitTime: 110
-  - timestamp: 460
+  - timestamp: 360
     mugState: 9
     waitTime: 60
-  - timestamp: 460
+  - timestamp: 370
     mugState: 6
     waitTime: 120
-  - timestamp: 460
+  - timestamp: 370
     mugState: 6
     waitTime: 120
-  - timestamp: 470
+  - timestamp: 370
     mugState: 6
     waitTime: 120
-  - timestamp: 470
+  - timestamp: 400
     mugState: 6
     waitTime: 120
   elapsedTime: 0
@@ -24094,8 +24094,8 @@ MonoBehaviour:
   finishedOneEspresso: 0
   finishedTwoIngredients: 0
   finishedThreeIngredients: 0
-  almostFinishedSound: {fileID: 0}
-  gameFinishedSound: {fileID: 0}
+  almostFinishedSound: {fileID: 8300000, guid: db1464b0765edd143a510c3a2d712956, type: 3}
+  gameFinishedSound: {fileID: 8300000, guid: 3318f166e2d6a784cb242731631e3c9a, type: 3}
   orders: []
 --- !u!4 &1944231855
 Transform:

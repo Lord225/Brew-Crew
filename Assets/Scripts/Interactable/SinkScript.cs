@@ -14,7 +14,12 @@ public class SinkScript : Interactable
     {
         if (otherItem.TryGetInventoryItemComponent(out MugState item))
         {
-            item.state = MugState.State.Water;
+            if(item.state == MugState.State.Empty)
+                item.state = MugState.State.Water;
+            else if(item.state == MugState.State.Expresso)
+                item.state = MugState.State.Americano;
+            else if (item.state == MugState.State.Dity)
+                item.state = MugState.State.Empty;
             return true;
         }
         return false;

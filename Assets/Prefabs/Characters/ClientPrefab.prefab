@@ -247,6 +247,7 @@ MonoBehaviour:
   endColor: {r: 1, g: 0, b: 0, a: 1}
   orderSound: {fileID: 8300000, guid: 3318f166e2d6a784cb242731631e3c9a, type: 3}
   eatSound: {fileID: 8300000, guid: 9b9a70402c681e04bb77c352608b5522, type: 3}
+  mugPrefab: {fileID: 1393050236794355415, guid: 3c32af64abdb37e49a316bf2ceed3682, type: 3}
 --- !u!114 &5147305407755208428
 MonoBehaviour:
   m_ObjectHideFlags: 0

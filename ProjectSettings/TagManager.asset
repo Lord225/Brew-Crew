@@ -8,6 +8,7 @@ TagManager:
   - Client
   - Door
   - OrderUIList
+  - CounterTop
   layers:
   - Default
   - TransparentFX

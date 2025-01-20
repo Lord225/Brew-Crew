@@ -12,6 +12,7 @@ public class ClientScript : MonoBehaviour
         MakingOrder,
         WaitingForOrder,
         Eating,
+        CounterTop,
         Leaving,
         Wardering,
     }
@@ -31,6 +32,8 @@ public class ClientScript : MonoBehaviour
 
     public AudioClip orderSound;
     public AudioClip eatSound;
+
+    public GameObject mugPrefab;
     
     public delegate void OnStateChange(State state);
 
@@ -88,6 +91,9 @@ public class ClientScript : MonoBehaviour
                 break;
             case State.Leaving:
                 Leave();
+                break;
+            case State.CounterTop:
+                MugLeave();
                 break;
             case State.Wardering:
                 animator.SetBool("waitingForSeat", true);
@@ -203,6 +209,19 @@ public class ClientScript : MonoBehaviour
             .FirstOrDefault();
     }
 
+    private CounterTopScript counterTop;
+    private CounterTopScript FindRandomCounterTop()
+    {
+        GameObject[] ct = GameObject.FindGameObjectsWithTag("CounterTop");
+
+        return ct
+            .Select(door => door.GetComponentInChildren<CounterTopScript>())
+            .Where(door => door != null)
+            .OrderBy(door => Vector3.Distance(transform.position, door.transform.position) + Random.Range(0f, 1f))
+            .FirstOrDefault();
+    }
+
+
     private void GoToTable()
     {
         if (targetTable != null)
@@ -235,6 +254,40 @@ public class ClientScript : MonoBehaviour
 
     }
 
+
+    void MugLeave() {
+        if (navMeshAgent.remainingDistance < 0.5f)
+        {
+            // try to put the mug on the counter top
+            if(counterTop.TryGetComponent(out Inventory inventory)) 
+            {
+                if(!inventory.hasItem()) {
+                    var mug = Instantiate(mugPrefab);
+                    inventory.InventoryItem = mug;
+                    if(inventory.TryGetInventoryItemComponent(out MugState state)) {
+                        state.state = MugState.State.Dity;
+                    }
+                }
+            } 
+            SetStateToLeave(true);
+        }
+    }
+
+    private void PutMugAndLeave() {
+        var counterTop = FindRandomCounterTop();
+        if (counterTop != null)
+        {
+            Debug.Log("Client found counter top " + counterTop.name);
+            this.counterTop = counterTop;
+            navMeshAgent.SetDestination(counterTop.transform.position);
+            navMeshAgent.stoppingDistance = 0.01f;
+            currentState = State.CounterTop;
+            OnStateChangeHandler?.Invoke(currentState);
+        } else {
+            SetStateToLeave(true);
+        }
+    }   
+
     private IEnumerator EatAndLeave()
     {
         // play Eat sound and collect sound
@@ -248,7 +301,12 @@ public class ClientScript : MonoBehaviour
             audio.PlayOneShot(eatSound);
         }
         yield return new WaitForSeconds(Random.Range(3, 5));
-        SetStateToLeave(true);
+        if(Random.Range(0, 100) < 50)
+        {
+            PutMugAndLeave();
+        }else {
+            SetStateToLeave(true);
+        }
     }
 
     private void Leave()

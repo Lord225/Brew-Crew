@@ -16,5 +16,5 @@ MonoBehaviour:
   itemType1: {fileID: 5815153783502203970, guid: 3c32af64abdb37e49a316bf2ceed3682, type: 3}
   itemState2: 0
   itemType2: {fileID: 5336857757533267372, guid: e25676d5a57d2fe41bd3a8899c8d6a84, type: 3}
-  resultState: 7
+  resultState: 4
   resultItem: {fileID: 0}

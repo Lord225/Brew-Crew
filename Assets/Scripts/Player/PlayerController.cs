@@ -136,9 +136,15 @@ public class NavMeshPlayerController : MonoBehaviour
     public GameObject outlinedObject;
 
     void RemoveOutline() {
-        if(outlinedObject != null) {
-            outlinedObject.GetOrAddComponent<Outline>().enabled = false;
-            outlinedObject = null;
+        try {
+            if(outlinedObject != null) {
+                if(!outlinedObject.IsDestroyed()){
+                    outlinedObject.GetOrAddComponent<Outline>().enabled = false;
+                }
+                outlinedObject = null;
+            }
+        } catch(System.Exception e) {
+            Debug.Log(e);
         }
     }
 
@@ -148,10 +154,18 @@ public class NavMeshPlayerController : MonoBehaviour
             return true;
         }
 
+        if(newGameObject.IsDestroyed()) {
+            RemoveOutline();
+            return true;
+        }
+
         if (outlinedObject == null || outlinedObject.GetInstanceID() != newGameObject.GetInstanceID()) { 
             RemoveOutline();
             var outline = newGameObject.GetOrAddComponent<Outline>();
-            outline.enabled = true;
+            if (outline != null)
+            {
+                outline.enabled = true;
+            }
             outline.OutlineColor = new Color(1f, 0.7137254902f, 0.0f);
             outlinedObject = newGameObject;
         } 
